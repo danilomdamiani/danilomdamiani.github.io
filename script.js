@@ -37,28 +37,6 @@ function initLucideIcons() {
 }
 
 // ============================================
-// MAGNETIC BUTTON EFFECT
-// ============================================
-
-function initMagneticEffect() {
-    const magneticElements = document.querySelectorAll('.magnetic-btn, .magnetic-link');
-    
-    magneticElements.forEach(el => {
-        el.addEventListener('mousemove', (e) => {
-            const rect = el.getBoundingClientRect();
-            const x = e.clientX - rect.left - rect.width / 2;
-            const y = e.clientY - rect.top - rect.height / 2;
-            
-            el.style.transform = `translate(${x * 0.3}px, ${y * 0.3}px)`;
-        });
-        
-        el.addEventListener('mouseleave', () => {
-            el.style.transform = 'translate(0, 0)';
-        });
-    });
-}
-
-// ============================================
 // NAVIGATION
 // ============================================
 
@@ -636,45 +614,6 @@ function initTextScramble() {
 }
 
 // ============================================
-// MOUSE PARALLAX FOR SERVICE CARDS
-// ============================================
-
-function initServiceParallax() {
-    const cards = document.querySelectorAll('.service-card');
-    
-    cards.forEach(card => {
-        const shapes = card.querySelectorAll('.abstract-shape');
-        
-        card.addEventListener('mousemove', (e) => {
-            const rect = card.getBoundingClientRect();
-            const x = (e.clientX - rect.left) / rect.width - 0.5;
-            const y = (e.clientY - rect.top) / rect.height - 0.5;
-            
-            shapes.forEach((shape, index) => {
-                const speed = (index + 1) * 10;
-                gsap.to(shape, {
-                    x: x * speed,
-                    y: y * speed,
-                    duration: 0.5,
-                    ease: 'power2.out'
-                });
-            });
-        });
-        
-        card.addEventListener('mouseleave', () => {
-            shapes.forEach(shape => {
-                gsap.to(shape, {
-                    x: 0,
-                    y: 0,
-                    duration: 0.5,
-                    ease: 'power2.out'
-                });
-            });
-        });
-    });
-}
-
-// ============================================
 // LOADING SCREEN
 // ============================================
 
@@ -757,9 +696,7 @@ if (heroVideo) {
 
 // Initialize additional effects after page load
 window.addEventListener('load', () => {
-    initMagneticEffect();
     initTextScramble();
-    initServiceParallax();
 });
 
 // ============================================
