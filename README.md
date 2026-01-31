@@ -1,2 +1,3 @@
 # danilomdamiani.github.io
-Site pessoal para portfólio de edição de video/Motion Graphics
+Personal portfolio website for video editing/motion graphics
+(you should hire me...)
