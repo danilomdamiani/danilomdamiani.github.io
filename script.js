@@ -246,6 +246,7 @@ function initPortfolioHover() {
     
     portfolioItems.forEach(item => {
         const video = item.querySelector('.portfolio-video');
+        const youtubeUrl = item.dataset.youtube;
         
         item.addEventListener('mouseenter', () => {
             if (video) {
@@ -260,8 +261,7 @@ function initPortfolioHover() {
         
         item.addEventListener('mouseleave', () => {
             if (video) {
-                video.pause();
-                video.currentTime = 0;
+                // Keep video playing - only reset scale
                 gsap.to(video, {
                     scale: 1,
                     duration: 0.6,
@@ -270,17 +270,10 @@ function initPortfolioHover() {
             }
         });
         
-        // Open modal on click
+        // Open modal with Wistia video on click
         item.addEventListener('click', () => {
-            const modal = document.getElementById('videoModal');
-            const modalVideo = modal.querySelector('.modal-video');
-            
-            if (video && modalVideo) {
-                modalVideo.querySelector('source').src = video.querySelector('source').src;
-                modalVideo.load();
-                openModal(modal);
-                modalVideo.play();
-            }
+            // All videos use the same Wistia ID for now
+            openWistiaModal('4l08fspoxt');
         });
     });
 }
@@ -308,8 +301,7 @@ function initVideoEditingHover() {
         
         item.addEventListener('mouseleave', () => {
             if (video) {
-                video.pause();
-                video.currentTime = 0;
+                // Keep video playing - only reset scale
                 gsap.to(video, {
                     scale: 1,
                     duration: 0.6,
@@ -318,17 +310,10 @@ function initVideoEditingHover() {
             }
         });
         
-        // Open modal on click
+        // Open modal with Wistia video on click
         item.addEventListener('click', () => {
-            const modal = document.getElementById('videoModal');
-            const modalVideo = modal.querySelector('.modal-video');
-            
-            if (video && modalVideo) {
-                modalVideo.querySelector('source').src = video.querySelector('source').src;
-                modalVideo.load();
-                openModal(modal);
-                modalVideo.play();
-            }
+            // All videos use the same Wistia ID for now
+            openWistiaModal('4l08fspoxt');
         });
     });
 }
@@ -399,12 +384,8 @@ function initVideoModals() {
     const showreelBtn = document.querySelector('.cta-showreel');
     if (showreelBtn && videoModal) {
         showreelBtn.addEventListener('click', () => {
-            const modalVideo = videoModal.querySelector('.modal-video');
-            // For demo, use a sample showreel video
-            modalVideo.querySelector('source').src = 'https://assets.mixkit.co/videos/preview/mixkit-digital-animation-of-futuristic-devices-99786-large.mp4';
-            modalVideo.load();
-            openModal(videoModal);
-            modalVideo.play();
+            // Showreel video - Wistia ID
+            openWistiaModal('4l08fspoxt');
         });
     }
     
@@ -434,24 +415,51 @@ function initVideoModals() {
     });
 }
 
+// Open modal with Wistia video
+function openWistiaModal(mediaId) {
+    const modal = document.getElementById('videoModal');
+    const iframe = modal.querySelector('.modal-wistia');
+    
+    if (iframe) {
+        // Wistia embed URL format
+        iframe.src = `https://fast.wistia.net/embed/iframe/${mediaId}`;
+    }
+    
+    openModal(modal);
+}
+
 function openModal(modal) {
     modal.classList.add('active');
     document.body.style.overflow = 'hidden';
     
-    gsap.from(modal.querySelector('.modal-content'), {
-        scale: 0.9,
-        opacity: 0,
-        duration: 0.4,
-        ease: 'power2.out'
-    });
+    // Use fromTo to ensure proper animation on re-open
+    gsap.fromTo(modal.querySelector('.modal-content'), 
+        {
+            scale: 0.9,
+            opacity: 0
+        },
+        {
+            scale: 1,
+            opacity: 1,
+            duration: 0.4,
+            ease: 'power2.out'
+        }
+    );
 }
 
 function closeModal(modal) {
     if (!modal) return;
     
     const video = modal.querySelector('video');
+    const iframe = modal.querySelector('.modal-wistia');
+    
     if (video) {
         video.pause();
+    }
+    
+    // Clear iframe src to stop Wistia video
+    if (iframe) {
+        iframe.src = '';
     }
     
     gsap.to(modal.querySelector('.modal-content'), {
@@ -462,6 +470,11 @@ function closeModal(modal) {
         onComplete: () => {
             modal.classList.remove('active');
             document.body.style.overflow = '';
+            // Reset modal content for next open
+            gsap.set(modal.querySelector('.modal-content'), {
+                scale: 0.9,
+                opacity: 0
+            });
         }
     });
 }
@@ -650,37 +663,16 @@ function initLoader() {
 }
 
 // ============================================
-// PERFORMANCE OPTIMIZATIONS
+// VIDEO AUTOPLAY SETUP
 // ============================================
 
-// Intersection Observer for video lazy loading
-const videoObserver = new IntersectionObserver((entries) => {
-    entries.forEach(entry => {
-        const video = entry.target;
-        if (entry.isIntersecting) {
-            video.load();
-            videoObserver.unobserve(video);
-        }
+// Start all preview videos immediately
+document.querySelectorAll('.portfolio-video, .video-editing-video').forEach(video => {
+    video.load();
+    video.play().catch(e => {
+        // Autoplay might be blocked by browser policy, that's ok
+        console.log('Autoplay blocked for video:', e);
     });
-}, { rootMargin: '50px' });
-
-// Observe all portfolio videos
-document.querySelectorAll('.portfolio-video').forEach(video => {
-    videoObserver.observe(video);
-});
-
-// Pause videos when not visible
-const visibilityObserver = new IntersectionObserver((entries) => {
-    entries.forEach(entry => {
-        const video = entry.target;
-        if (!entry.isIntersecting && !video.paused) {
-            video.pause();
-        }
-    });
-}, { threshold: 0.1 });
-
-document.querySelectorAll('.portfolio-video').forEach(video => {
-    visibilityObserver.observe(video);
 });
 
 // ============================================
