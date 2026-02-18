@@ -302,25 +302,8 @@ function closeModal(modal) {
 }
 
 function openShowreelModal() {
-    const modal = document.getElementById('videoModal');
-    const container = document.getElementById('wistiaContainer');
-    
-    // Clear previous content
-    container.innerHTML = '';
-    container.className = 'modal-video-container';
-    
-    // Create message content
-    const messageHTML = `
-        <div style="display: flex; flex-direction: column; align-items: center; justify-content: center; height: 100%; padding: 2rem; text-align: center; color: white;">
-            <p style="font-size: 1.5rem; margin-bottom: 1rem;">I'm still building this website...</p>
-            <p style="font-size: 1.2rem; opacity: 0.8;">but you can check out my edits down below!</p>
-        </div>
-    `;
-    
-    container.innerHTML = messageHTML;
-    
-    modal.classList.add('active');
-    document.body.style.overflow = 'hidden';
+    // Open the intro video with the wistia ID ix59z2nms7
+    openWistiaModal('ix59z2nms7');
 }
 
 // ============================================
